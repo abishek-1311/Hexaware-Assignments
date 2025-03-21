@@ -1,0 +1,928 @@
+			Assignment 1 : TechShop, an electronic gadgets shop
+		    =============================================================
+	
+TASK 1:
+=======
+
+1. Create the database named "TechShop"
+
+mysql> create database TechShop;
+Query OK, 1 row affected (1.03 sec)
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| school             |
+| student            |
+| sys                |
+| techshop           |
++--------------------+
+7 rows in set (0.28 sec)
+
+mysql> USE techshop;
+Database changed
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+2. Define the schema for the Customers, Products, Orders, OrderDetails and Inventory tables
+based on the provided schema.
+4. Create appropriate Primary Key and Foreign Key constraints for referential integrity.
+
+==================================================CREATING CUSTOMER TABLE===================================================
+mysql> create table Customers(
+    -> cust_id INT PRIMARY KEY,
+    -> first_name varchar(20) NOT NULL,
+    -> last_name varchar(20) NOT NULL,
+    -> email varchar(40) UNIQUE,
+    -> phone INT check(length(phone)=10),
+    -> address varchar(40) );
+Query OK, 0 rows affected (4.31 sec)
+
+mysql> desc customers;
++------------+-------------+------+-----+---------+-------+
+| Field      | Type        | Null | Key | Default | Extra |
++------------+-------------+------+-----+---------+-------+
+| cust_id    | int         | NO   | PRI | NULL    |       |
+| first_name | varchar(20) | NO   |     | NULL    |       |
+| last_name  | varchar(20) | NO   |     | NULL    |       |
+| email      | varchar(40) | YES  | UNI | NULL    |       |
+| phone      | int         | YES  |     | NULL    |       |
+| address    | varchar(40) | YES  |     | NULL    |       |
++------------+-------------+------+-----+---------+-------+
+6 rows in set (0.14 sec)
+
+==================================================CREATING PRODUCTS TABLE==================================================
+
+mysql> create table Products(
+    -> p_id INT PRIMARY KEY,
+    -> p_name varchar(30) NOT NULL,
+    -> p_desc varchar(30),
+    -> price INT);
+Query OK, 0 rows affected (1.24 sec)
+
+mysql> DESC PRODUCTS;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| p_id   | int         | NO   | PRI | NULL    |       |
+| p_name | varchar(30) | NO   |     | NULL    |       |
+| p_desc | varchar(30) | YES  |     | NULL    |       |
+| price  | int         | YES  |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+4 rows in set (0.06 sec)
+
+
+==================================================CREATING ORDERS TABLE=========================================================
+
+mysql> CREATE table orders(
+    -> ord_id INT PRIMARY KEY,
+    -> cust_id INT,
+    -> ord_date DATE,
+    -> total_amt INT,
+    -> FOREIGN KEY(cust_id) REFERENCES Customers(cust_id));
+Query OK, 0 rows affected (1.92 sec)
+
+mysql> desc orders;
++-----------+------+------+-----+---------+-------+
+| Field     | Type | Null | Key | Default | Extra |
++-----------+------+------+-----+---------+-------+
+| ord_id    | int  | NO   | PRI | NULL    |       |
+| cust_id   | int  | YES  | MUL | NULL    |       |
+| ord_date  | date | YES  |     | NULL    |       |
+| total_amt | int  | YES  |     | NULL    |       |
++-----------+------+------+-----+---------+-------+
+4 rows in set (0.04 sec)
+
+==================================================CREATING ORDERS TABLE==================================================
+
+mysql> create table orderdetails(
+    -> orddetails_id INT PRIMARY KEY 	
+    -> ord_id INT,
+    -> p_id INT,
+    -> qty INT,
+    -> FOREIGN KEY(ord_id) REFERENCES orders(ord_id),
+    -> FOREIGN KEY(p_id)   REFERENCES products(p_id));
+Query OK, 0 rows affected (0.90 sec)
+
+
+mysql> desc orderdetails;
++--------------+------+------+-----+---------+----------------+
+| Field        | Type | Null | Key | Default | Extra          |
++--------------+------+------+-----+---------+----------------+
+| orddetail_id | int  | NO   | PRI | NULL    | auto_increment |
+| ord_id       | int  | YES  | MUL | NULL    |                |
+| p_id         | int  | YES  | MUL | NULL    |                |
+| qty          | int  | YES  |     | NULL    |                |
++--------------+------+------+-----+---------+----------------+
+4 rows in set (2.05 sec)
+
+
+==================================================CREATING INVENTORY TABLE================================================
+
+
+mysql> create table inventory(
+    -> in_id INT,
+    -> P_id INT,
+    -> qty_in_stock INT,
+    -> last_stock_update DATE,
+    -> FOREIGN KEY(p_id) REFERENCES products(P_id));
+Query OK, 0 rows affected (1.28 sec)
+
+mysql> desc inventory;
++-------------------+------+------+-----+---------+-------+
+| Field             | Type | Null | Key | Default | Extra |
++-------------------+------+------+-----+---------+-------+
+| in_id             | int  | YES  |     | NULL    |       |
+| P_id              | int  | YES  | MUL | NULL    |       |
+| qty_in_stock      | int  | YES  |     | NULL    |       |
+| last_stock_update | date | YES  |     | NULL    |       |
++-------------------+------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+---------------------------------------------------------------------------------------------------------------------------
+
+5. Insert at least 10 sample records into each of the following tables.
+a. Customers
+b. Products
+c. Orders
+d. OrderDetails
+e. Inventory
+
+==================================================INSERTING IN CUSTOMERS TABLE=======================================================
+
+
+mysql> INSERT INTO Customers (cust_id, first_name, last_name, email, phone, address) VALUES
+    -> (100, 'Abishek', 'Joel', 'abishek.joel@gmail.com', '9876543210', 'Villupuram, Tamil Nadu'),
+    -> (101, 'Jai', 'Murugan', 'jai.murugan@gmail.com', '9123456780', 'Chennai, Tamil Nadu'),
+    -> (102, 'Karthik', 'Suburaj', 'karthik.suburaj@gmail.com', '9988776655', 'Tiruvannamalai, Tamil Nadu'),
+    -> (103, 'Mohan', 'Babu', 'mohan.babu@gmail.com', '9090909090', 'Villupuram, Tamil Nadu'),
+    -> (104, 'Priya', 'Sundar', 'priya.sundar@gmail.com', '9191919191', 'Chennai, Tamil Nadu'),
+    -> (105, 'Ramesh', 'Venkatesan', 'ramesh.venkat@gmail.com', '9234567890', 'Tiruvannamalai, Tamil Nadu'),
+    -> (106, 'Sandhya', 'Murali', 'sandhya.murali@gmail.com', '9345678901', 'Villupuram, Tamil Nadu'),
+    -> (107, 'Ganesh', 'Subramani', 'ganesh.subramani@gmail.com', '9456789012', 'Chennai, Tamil Nadu'),
+    -> (108, 'Meena', 'Ravi', 'meena.ravi@gmail.com', '9567890123', 'Tiruvannamalai, Tamil Nadu'),
+    -> (109, 'Vikram', 'S', 'vikram.s@gmail.com', '9678901234', 'Villupuram, Tamil Nadu');
+Query OK, 10 rows affected (0.23 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> select * from customers;
++---------+------------+------------+----------------------------+------------+----------------------------+
+| cust_id | first_name | last_name  | email                      | phone      | address                    |
++---------+------------+------------+----------------------------+------------+----------------------------+
+|     100 | Abishek    | Joel       | abishek@gmail.com          | 9876543210 | Villupuram, Tamil Nadu     |
+|     101 | Jai        | Murugan    | jai.murugan@gmail.com      | 9123456780 | Chennai, Tamil Nadu        |
+|     102 | Karthik    | Rajan      | karthik.rajan@gmail.com    | 9988776655 | Tiruvannamalai, Tamil Nadu |
+|     103 | Mohan      | Babu       | mohan.babu@gmail.com       | 9090909090 | Villupuram, Tamil Nadu     |
+|     104 | Priya      | Sundar     | priya.sundar@gmail.com     | 9191919191 | Chennai, Tamil Nadu        |
+|     105 | Ramesh     | Venkatesan | ramesh.venkat@gmail.com    | 9234567890 | Tiruvannamalai, Tamil Nadu |
+|     106 | Sandhya    | Murali     | sandhya.murali@gmail.com   | 9345678901 | Villupuram, Tamil Nadu     |
+|     107 | Ganesh     | Subramani  | ganesh.subramani@gmail.com | 9456789012 | Chennai, Tamil Nadu        |
+|     108 | Meena      | Ravi       | meena.ravi@gmail.com       | 9567890123 | Tiruvannamalai, Tamil Nadu |
+|     109 | Vikram     | S          | vikram.s@gmail.com         | 9678901234 | Villupuram, Tamil Nadu     |
++---------+------------+------------+----------------------------+------------+----------------------------+
+10 rows in set (0.00 sec)
+
+==================================================INSERTING IN ORDERS TABLE======================================================
+
+
+mysql> INSERT INTO Products (p_id, p_name, p_desc, price) VALUES
+    -> (1, 'Laptop', 'Dell Inspiron 15', 55000),
+    -> (2, 'Smartphone', 'Samsung Galaxy S21', 40000),
+    -> (3, 'Tablet', 'Apple iPad Air', 45000),
+    -> (4, 'Headphones', 'Sony WH-1000XM4', 20000),
+    -> (5, 'Smartwatch', 'Apple Watch Series 7', 38000),
+    -> (6, 'Camera', 'Canon EOS 1500D', 35000),
+    -> (7, 'Monitor', 'LG UltraFine 4K', 30000),
+    -> (8, 'Keyboard', 'Mechanical RGB Keyboard', 5000),
+    -> (9, 'Mouse', 'Logitech MX Master 3', 7000),
+    -> (10, 'Speaker', 'JBL Bluetooth Speaker', 8000);
+Query OK, 10 rows affected (0.26 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * from products;
++------+------------+-------------------------+-------+
+| p_id | p_name     | p_desc                  | price |
++------+------------+-------------------------+-------+
+|    1 | Laptop     | Dell Inspiron 15        | 55000 |
+|    2 | Smartphone | Samsung Galaxy S21      | 40000 |
+|    3 | Tablet     | Apple iPad Air          | 45000 |
+|    4 | Headphones | Sony WH-1000XM4         | 20000 |
+|    5 | Smartwatch | Apple Watch Series 7    | 38000 |
+|    6 | Camera     | Canon EOS 1500D         | 35000 |
+|    7 | Monitor    | LG UltraFine 4K         | 30000 |
+|    8 | Keyboard   | Mechanical RGB Keyboard |  5000 |
+|    9 | Mouse      | Logitech MX Master 3    |  7000 |
+|   10 | Speaker    | JBL Bluetooth Speaker   |  8000 |
++------+------------+-------------------------+-------+
+10 rows in set (0.00 sec)
+
+==================================================INSERTING IN ORDER TABLE======================================================
+
+mysql> INSERT INTO Orders (ord_id, cust_id, ord_date, total_amt) VALUES
+    -> (1, 100, '2024-03-01', 45000),
+    -> (2, 101, '2024-03-02', 60000),
+    -> (3, 102, '2024-03-03', 75000),
+    -> (4, 103, '2024-03-04', 20000),
+    -> (5, 104, '2024-03-05', 15000),
+    -> (6, 105, '2024-03-06', 30000),
+    -> (7, 106, '2024-03-07', 50000),
+    -> (8, 107, '2024-03-08', 18000),
+    -> (9, 108, '2024-03-09', 28000),
+    -> (10, 109, '2024-03-10', 62000);
+Query OK, 10 rows affected (0.17 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM Orders;
++--------+---------+------------+-----------+
+| ord_id | cust_id | ord_date   | total_amt |
++--------+---------+------------+-----------+
+|      1 |     100 | 2024-03-01 |     45000 |
+|      2 |     101 | 2024-03-02 |     60000 |
+|      3 |     102 | 2024-03-03 |     75000 |
+|      4 |     103 | 2024-03-04 |     20000 |
+|      5 |     104 | 2024-03-05 |     15000 |
+|      6 |     105 | 2024-03-06 |     30000 |
+|      7 |     106 | 2024-03-07 |     50000 |
+|      8 |     107 | 2024-03-08 |     18000 |
+|      9 |     108 | 2024-03-09 |     28000 |
+|     10 |     109 | 2024-03-10 |     62000 |
++--------+---------+------------+-----------+
+10 rows in set (0.04 sec)
+
+==================================================INSERTING IN ORDERDETAILS TABLE======================================================
+
+
+mysql> INSERT INTO OrderDetails (orddetails_id,ord_id,p_id,qty) VALUES
+    -> (1,1, 3, 2),  -- Order 1: 2 Apple iPads
+    -> (2,1, 5, 1),  -- Order 1: 1 Apple Watch
+    -> (3,2, 2, 3),  -- Order 2: 3 Samsung Galaxy S21
+    -> (4,2, 7, 1),  -- Order 2: 1 LG UltraFine Monitor
+    -> (5,3, 1, 1),  -- Order 3: 1 Dell Laptop
+    -> (6,4, 4, 2),  -- Order 4: 2 Sony Headphones
+    -> (7,5, 8, 5),  -- Order 5: 5 RGB Keyboards
+    -> (8,6, 9, 3),  -- Order 6: 3 Logitech Mouse
+    -> (9,7, 6, 2),  -- Order 7: 2 Canon Cameras
+    -> (10,8, 10, 4); -- Order 8: 4 JBL Speakers
+Query OK, 10 rows affected (0.18 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> select * from orderdetails;
++--------------+--------+------+------+
+| orddetail_id | ord_id | p_id | qty  |
++--------------+--------+------+------+
+|            1 |      1 |    3 |    2 |
+|            2 |      1 |    5 |    1 |
+|            3 |      2 |    2 |    3 |
+|            4 |      2 |    7 |    1 |
+|            5 |      3 |    1 |    1 |
+|            6 |      4 |    4 |    2 |
+|            7 |      5 |    8 |    5 |
+|            8 |      6 |    9 |    3 |
+|            9 |      7 |    6 |    2 |
+|           10 |      8 |   10 |    4 |
++--------------+--------+------+------+
+9 rows in set (0.00 sec)
+
+==================================================INSERTING IN INVENTORY TABLE======================================================
+
+
+mysql> INSERT INTO Inventory (in_id, p_id, qty_in_stock, last_stock_update) VALUES
+    -> (1, 1, 50, '2024-03-01'),
+    -> (2, 2, 30, '2024-03-02'),
+    -> (3, 3, 20, '2024-03-03'),
+    -> (4, 4, 40, '2024-03-04'),
+    -> (5, 5, 25, '2024-03-05'),
+    -> (6, 6, 15, '2024-03-06'),
+    -> (7, 7, 10, '2024-03-07'),
+    -> (8, 8, 60, '2024-03-08'),
+    -> (9, 9, 35, '2024-03-09'),
+    -> (10, 10, 45, '2024-03-10');
+Query OK, 10 rows affected (0.32 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+
+mysql> SELECT * FROM INVENTORY;
++-------+------+--------------+-------------------+
+| in_id | P_id | qty_in_stock | last_stock_update |
++-------+------+--------------+-------------------+
+|     1 |    1 |           50 | 2024-03-01        |
+|     2 |    2 |           30 | 2024-03-02        |
+|     3 |    3 |           20 | 2024-03-03        |
+|     4 |    4 |           40 | 2024-03-04        |
+|     5 |    5 |           25 | 2024-03-05        |
+|     6 |    6 |           15 | 2024-03-06        |
+|     7 |    7 |           10 | 2024-03-07        |
+|     8 |    8 |           60 | 2024-03-08        |
+|     9 |    9 |           35 | 2024-03-09        |
+|    10 |   10 |           45 | 2024-03-10        |
++-------+------+--------------+-------------------+
+10 rows in set (0.00 sec)
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+TASK : 2
+========
+
+1. Write an SQL query to retrieve the names and emails of all customers.
+
+
+mysql> SELECT first_name , last_name , email from customers;
+
++------------+------------+----------------------------+
+| first_name | last_name  | email                      |
++------------+------------+----------------------------+
+| Abishek    | Joel       | abishek@gmail.com          |
+| Jai        | Murugan    | jai.murugan@gmail.com      |
+| Karthik    | Rajan      | karthik.rajan@gmail.com    |
+| Mohan      | Babu       | mohan.babu@gmail.com       |
+| Priya      | Sundar     | priya.sundar@gmail.com     |
+| Ramesh     | Venkatesan | ramesh.venkat@gmail.com    |
+| Sandhya    | Murali     | sandhya.murali@gmail.com   |
+| Ganesh     | Subramani  | ganesh.subramani@gmail.com |
+| Meena      | Ravi       | meena.ravi@gmail.com       |
+| Vikram     | S          | vikram.s@gmail.com         |
++------------+------------+----------------------------+
+10 rows in set (0.00 sec)
+
+2. Write an SQL query to list all orders with their order dates and corresponding customer
+names.
+
+mysql> select o.ord_id,c.first_name,c.last_name,o.ord_date from orders o join customers c
+    -> on o.cust_id=c.cust_id;
+
++--------+------------+------------+------------+
+| ord_id | first_name | last_name  | ord_date   |
++--------+------------+------------+------------+
+|      1 | Abishek    | Joel       | 2024-03-01 |
+|      2 | Jai        | Murugan    | 2024-03-02 |
+|      3 | Karthik    | Rajan      | 2024-03-03 |
+|      4 | Mohan      | Babu       | 2024-03-04 |
+|      5 | Priya      | Sundar     | 2024-03-05 |
+|      6 | Ramesh     | Venkatesan | 2024-03-06 |
+|      7 | Sandhya    | Murali     | 2024-03-07 |
+|      8 | Ganesh     | Subramani  | 2024-03-08 |
+|      9 | Meena      | Ravi       | 2024-03-09 |
+|     10 | Vikram     | S          | 2024-03-10 |
++--------+------------+------------+------------+
+10 rows in set (0.02 sec)
+
+3. Write an SQL query to insert a new customer record into the "Customers" table. Include
+customer information such as name, email, and address.
+
+mysql> Insert into customers(cust_id,First_name,last_name,email,address) values
+    -> (110,'yamini','bala','yamini.bala@gmail.com','chennai, Tamil Nadu');
+Query OK, 1 row affected (0.10 sec)
+
+mysql> select * from customers;
++---------+------------+------------+----------------------------+------------+----------------------------+
+| cust_id | first_name | last_name  | email                      | phone      | address                    |
++---------+------------+------------+----------------------------+------------+----------------------------+
+|     100 | Abishek    | Joel       | abishek@gmail.com          | 9876543210 | Villupuram, Tamil Nadu     |
+|     101 | Jai        | Murugan    | jai.murugan@gmail.com      | 9123456780 | Chennai, Tamil Nadu        |
+|     102 | Karthik    | Rajan      | karthik.rajan@gmail.com    | 9988776655 | Tiruvannamalai, Tamil Nadu |
+|     103 | Mohan      | Babu       | mohan.babu@gmail.com       | 9090909090 | Villupuram, Tamil Nadu     |
+|     104 | Priya      | Sundar     | priya.sundar@gmail.com     | 9191919191 | Chennai, Tamil Nadu        |
+|     105 | Ramesh     | Venkatesan | ramesh.venkat@gmail.com    | 9234567890 | Tiruvannamalai, Tamil Nadu |
+|     106 | Sandhya    | Murali     | sandhya.murali@gmail.com   | 9345678901 | Villupuram, Tamil Nadu     |
+|     107 | Ganesh     | Subramani  | ganesh.subramani@gmail.com | 9456789012 | Chennai, Tamil Nadu        |
+|     108 | Meena      | Ravi       | meena.ravi@gmail.com       | 9567890123 | Tiruvannamalai, Tamil Nadu |
+|     109 | Vikram     | S          | vikram.s@gmail.com         | 9678901234 | Villupuram, Tamil Nadu     |
+|     110 | yamini     | bala       | yamini.bala@gmail.com      | NULL       | chennai, Tamil Nadu        |
++---------+------------+------------+----------------------------+------------+----------------------------+
+11 rows in set (0.00 sec)
+
+4. Write an SQL query to update the prices of all electronic gadgets in the "Products" table by
+increasing them by 10%.
+
+
+mysql> update products
+    -> set price = price+(price*0.1);
+Query OK, 10 rows affected (0.14 sec)
+Rows matched: 10  Changed: 10  Warnings: 0
+
+mysql> select * from products;
++------+------------+-------------------------+-------+
+| p_id | p_name     | p_desc                  | price |
++------+------------+-------------------------+-------+
+|    1 | Laptop     | Dell Inspiron 15        | 60500 |
+|    2 | Smartphone | Samsung Galaxy S21      | 44000 |
+|    3 | Tablet     | Apple iPad Air          | 49500 |
+|    4 | Headphones | Sony WH-1000XM4         | 22000 |
+|    5 | Smartwatch | Apple Watch Series 7    | 41800 |
+|    6 | Camera     | Canon EOS 1500D         | 38500 |
+|    7 | Monitor    | LG UltraFine 4K         | 33000 |
+|    8 | Keyboard   | Mechanical RGB Keyboard |  5500 |
+|    9 | Mouse      | Logitech MX Master 3    |  7700 |
+|   10 | Speaker    | JBL Bluetooth Speaker   |  8800 |
++------+------------+-------------------------+-------+
+10 rows in set (0.00 sec)
+
+
+
+5. Write an SQL query to delete a specific order and its associated order details from the
+"Orders" and "OrderDetails" tables. Allow users to input the order ID as a parameter.
+
+mysql> delete from orders where ord_id= 6;
+Query OK, 1 row affected (0.09 sec)
+
+mysql> select * from orders;
++--------+---------+------------+-----------+
+| ord_id | cust_id | ord_date   | total_amt |
++--------+---------+------------+-----------+
+|      1 |     100 | 2024-03-01 |     45000 |
+|      2 |     101 | 2024-03-02 |     60000 |
+|      3 |     102 | 2024-03-03 |     75000 |
+|      4 |     103 | 2024-03-04 |     20000 |
+|      5 |     104 | 2024-03-05 |     15000 |
+|      7 |     106 | 2024-03-07 |     50000 |
+|      8 |     107 | 2024-03-08 |     18000 |
+|      9 |     108 | 2024-03-09 |     28000 |
+|     10 |     109 | 2024-03-10 |     62000 |
++--------+---------+------------+-----------+
+9 rows in set (0.00 sec)
+
+mysql> select * from orderdetails;
++--------+------+------+
+| ord_id | p_id | qty  |
++--------+------+------+
+|      1 |    3 |    2 |
+|      1 |    5 |    1 |
+|      2 |    2 |    3 |
+|      2 |    7 |    1 |
+|      3 |    1 |    1 |
+|      4 |    4 |    2 |
+|      5 |    8 |    5 |
+|      7 |    6 |    2 |
+|      8 |   10 |    4 |
++--------+------+------+
+9 rows in set (0.00 sec)
+
+6. Write an SQL query to insert a new order into the "Orders" table. Include the customer ID,
+order date, and any other necessary information.
+
+
+mysql> Insert into orders values(11, 105, '2024-03-11', 30000);
+Query OK, 1 row affected (0.11 sec)
+
+mysql> select * from orders;
++--------+---------+------------+-----------+
+| ord_id | cust_id | ord_date   | total_amt |
++--------+---------+------------+-----------+
+|      1 |     100 | 2024-03-01 |     45000 |
+|      2 |     101 | 2024-03-02 |     60000 |
+|      3 |     102 | 2024-03-03 |     75000 |
+|      4 |     103 | 2024-03-04 |     20000 |
+|      5 |     104 | 2024-03-05 |     15000 |
+|      7 |     106 | 2024-03-07 |     50000 |
+|      8 |     107 | 2024-03-08 |     18000 |
+|      9 |     108 | 2024-03-09 |     28000 |
+|     10 |     109 | 2024-03-10 |     62000 |
+|     11 |     105 | 2024-03-11 |     30000 |
++--------+---------+------------+-----------+
+10 rows in set (0.00 sec)
+
+
+7. Write an SQL query to update the contact information (e.g., email and address) of a specific
+customer in the "Customers" table. Allow users to input the customer ID and new contact
+information.
+
+
+mysql> update customers
+    -> set email="jai@gmail.com",address='villupuram, Tamil Nadu'
+    -> where cust_id = 101;
+Query OK, 1 row affected (0.17 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from customers;
++---------+------------+------------+----------------------------+------------+----------------------------+
+| cust_id | first_name | last_name  | email                      | phone      | address                    |
++---------+------------+------------+----------------------------+------------+----------------------------+
+|     100 | Abishek    | Joel       | abishek@gmail.com          | 9876543210 | Villupuram, Tamil Nadu     |
+|     101 | Jai        | Murugan    | jai@gmail.com              | 9123456780 | villupuram, Tamil Nadu     |
+|     102 | Karthik    | Rajan      | karthik.rajan@gmail.com    | 9988776655 | Tiruvannamalai, Tamil Nadu |
+|     103 | Mohan      | Babu       | mohan.babu@gmail.com       | 9090909090 | Villupuram, Tamil Nadu     |
+|     104 | Priya      | Sundar     | priya.sundar@gmail.com     | 9191919191 | Chennai, Tamil Nadu        |
+|     105 | Ramesh     | Venkatesan | ramesh.venkat@gmail.com    | 9234567890 | Tiruvannamalai, Tamil Nadu |
+|     106 | Sandhya    | Murali     | sandhya.murali@gmail.com   | 9345678901 | Villupuram, Tamil Nadu     |
+|     107 | Ganesh     | Subramani  | ganesh.subramani@gmail.com | 9456789012 | Chennai, Tamil Nadu        |
+|     108 | Meena      | Ravi       | meena.ravi@gmail.com       | 9567890123 | Tiruvannamalai, Tamil Nadu |
+|     109 | Vikram     | S          | vikram.s@gmail.com         | 9678901234 | Villupuram, Tamil Nadu     |
+|     110 | yamini     | bala       | yamini.bala@gmail.com      | NULL       | chennai, Tamil Nadu        |
++---------+------------+------------+----------------------------+------------+----------------------------+
+11 rows in set (0.00 sec)
+
+8. Write an SQL query to recalculate and update the total cost of each order in the "Orders" table based on the prices and quantities in the "OrderDetails" table.
+
+
+9. Write an SQL query to delete all orders and their associated order details for a specific
+customer from the "Orders" and "OrderDetails" tables. Allow users to input the customer ID
+as a parameter
+
+mysql> delete from orders where cust_id=105;
+Query OK, 1 row affected (0.14 sec)
+
+
+10. Write an SQL query to insert a new electronic gadget product into the "Products" table,
+including product name, category, price, and any other relevant details
+
+mysql>insert into products values(11,'Wireless Headphones','Bluetooth 5.0',2999);
+Query OK, 1 row affected (0.07 sec)
+
+
+mysql> select * from products;
++------+---------------------+-------------------------+-------+
+| p_id | p_name              | p_desc                  | price |
++------+---------------------+-------------------------+-------+
+|    1 | Laptop              | Dell Inspiron 15        | 60500 |
+|    2 | Smartphone          | Samsung Galaxy S21      | 44000 |
+|    3 | Tablet              | Apple iPad Air          | 49500 |
+|    4 | Headphones          | Sony WH-1000XM4         | 22000 |
+|    5 | Smartwatch          | Apple Watch Series 7    | 41800 |
+|    6 | Camera              | Canon EOS 1500D         | 38500 |
+|    7 | Monitor             | LG UltraFine 4K         | 33000 |
+|    8 | Keyboard            | Mechanical RGB Keyboard |  5500 |
+|    9 | Mouse               | Logitech MX Master 3    |  7700 |
+|   10 | Speaker             | JBL Bluetooth Speaker   |  8800 |
+|   11 | Wireless Headphones | Bluetooth 5.0           |  2999 |
++------+---------------------+-------------------------+-------+
+11 rows in set (0.68 sec)
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+TASK :3 
+========
+
+1. Write an SQL query to retrieve a list of all orders along with customer information (e.g.,
+customer name) for each order
+
+
+mysql> select o.ord_id, o.ord_date, o.total_amt, c.first_name,c.last_name,c.email from orders o join customers c
+    -> on o.cust_id = c.cust_id;
++--------+------------+-----------+------------+-----------+----------------------------+
+| ord_id | ord_date   | total_amt | first_name | last_name | email                      |
++--------+------------+-----------+------------+-----------+----------------------------+
+|      1 | 2024-03-01 |    140800 | Abishek    | Joel      | abishek@gmail.com          |
+|      2 | 2024-03-02 |    165000 | Jai        | Murugan   | jai@gmail.com              |
+|      3 | 2024-03-03 |     60500 | Karthik    | Rajan     | karthik.rajan@gmail.com    |
+|      4 | 2024-03-04 |     44000 | Mohan      | Babu      | mohan.babu@gmail.com       |
+|      5 | 2024-03-05 |     27500 | Priya      | Sundar    | priya.sundar@gmail.com     |
+|      7 | 2024-03-07 |     77000 | Sandhya    | Murali    | sandhya.murali@gmail.com   |
+|      8 | 2024-03-08 |     35200 | Ganesh     | Subramani | ganesh.subramani@gmail.com |
+|      9 | 2024-03-09 |      NULL | Meena      | Ravi      | meena.ravi@gmail.com       |
+|     10 | 2024-03-10 |      NULL | Vikram     | S         | vikram.s@gmail.com         |
++--------+------------+-----------+------------+-----------+----------------------------+
+9 rows in set (0.00 sec)
+
+
+2.Write an SQL query to find the total revenue generated by each electronic gadget product.
+Include the product name and the total revenue
+
+
+mysql> select p.p_name , sum(p.price * od.qty) from orderdetails od
+    -> inner join products p
+    -> on p.p_id = od.p_id
+    -> group by od.p_id;
+
+
++------------+-----------------------+
+| p_name     | sum(p.price * od.qty) |
++------------+-----------------------+
+| Tablet     |                 99000 |
+| Smartwatch |                 41800 |
+| Smartphone |                132000 |
+| Monitor    |                 33000 |
+| Laptop     |                 60500 |
+| Headphones |                 44000 |
+| Keyboard   |                 27500 |
+| Camera     |                 77000 |
+| Speaker    |                 35200 |
++------------+-----------------------+
+9 rows in set (0.19 sec)
+
+
+3. Write an SQL query to list all customers who have made at least one purchase. Include their
+names and contact information.
+
+
+mysql> select concat(c.first_name,' ',c.last_name), c.phone,c.email from customers c
+    -> join orders o
+    -> on c.cust_id = o.cust_id;
++--------------------------------------+------------+----------------------------+
+| concat(c.first_name,' ',c.last_name) | phone      | email                      |
++--------------------------------------+------------+----------------------------+
+| Abishek Joel                         | 9876543210 | abishek@gmail.com          |
+| Jai Murugan                          | 9123456780 | jai@gmail.com              |
+| Karthik Rajan                        | 9988776655 | karthik.rajan@gmail.com    |
+| Mohan Babu                           | 9090909090 | mohan.babu@gmail.com       |
+| Priya Sundar                         | 9191919191 | priya.sundar@gmail.com     |
+| Sandhya Murali                       | 9345678901 | sandhya.murali@gmail.com   |
+| Ganesh Subramani                     | 9456789012 | ganesh.subramani@gmail.com |
+| Meena Ravi                           | 9567890123 | meena.ravi@gmail.com       |
+| Vikram S                             | 9678901234 | vikram.s@gmail.com         |
++--------------------------------------+------------+----------------------------+
+9 rows in set (0.10 sec)
+
+
+4. Write an SQL query to find the most popular electronic gadget, which is the one with the highest
+total quantity ordered. Include the product name and the total quantity ordered.
+
+mysql> select p.p_name, sum(od.qty) from orderdetails od
+    -> join products p
+    -> on od.p_id = p.p_id
+    -> group by od.p_id
+    -> order by sum(od.qty) desc limit 1;
++----------+-------------+
+| p_name   | sum(od.qty) |
++----------+-------------+
+| Keyboard |           5 |
++----------+-------------+
+1 row in set (0.07 sec)
+
+5. Write an SQL query to retrieve a list of electronic gadgets along with their corresponding
+categories.
+
+
+mysql> select p_name , p_desc from products;
++---------------------+-------------------------+
+| p_name              | p_desc                  |
++---------------------+-------------------------+
+| Laptop              | Dell Inspiron 15        |
+| Smartphone          | Samsung Galaxy S21      |
+| Tablet              | Apple iPad Air          |
+| Headphones          | Sony WH-1000XM4         |
+| Smartwatch          | Apple Watch Series 7    |
+| Camera              | Canon EOS 1500D         |
+| Monitor             | LG UltraFine 4K         |
+| Keyboard            | Mechanical RGB Keyboard |
+| Mouse               | Logitech MX Master 3    |
+| Speaker             | JBL Bluetooth Speaker   |
+| Wireless Headphones | Bluetooth 5.0           |
++---------------------+-------------------------+
+11 rows in set (0.00 sec)
+
+6. Write an SQL query to calculate the average order value for each customer. Include the
+customer's name and their average order value.
+
+mysql> select concat(c.first_name , ' ' , c.last_name) AS name , avg(o.total_amt) from customers c
+    -> inner join orders o
+    -> on c.cust_id = o.cust_id
+    -> group by c.cust_id;
+
++------------------+------------------+
+| name             | avg(o.total_amt) |
++------------------+------------------+
+| Abishek Joel     |      140800.0000 |
+| Jai Murugan      |      165000.0000 |
+| Karthik Rajan    |       60500.0000 |
+| Mohan Babu       |       44000.0000 |
+| Priya Sundar     |       27500.0000 |
+| Sandhya Murali   |       77000.0000 |
+| Ganesh Subramani |       35200.0000 |
+| Meena Ravi       |             NULL |
+| Vikram S         |             NULL |
++------------------+------------------+
+9 rows in set (0.07 sec)
+
+7. Write an SQL query to find the order with the highest total revenue. Include the order ID,
+customer information, and the total revenue.
+
+
+mysql> select o.ord_id, c.first_name , c.last_name , c.email, c.phone ,c.address , total_amt from customers c
+    -> inner join orders o
+    -> on c.cust_id = o.cust_id
+    -> order by o.total_amt desc limit 1;
+
++--------+------------+-----------+---------------+------------+------------------------+-----------+
+| ord_id | first_name | last_name | email         | phone      | address                | total_amt |
++--------+------------+-----------+---------------+------------+------------------------+-----------+
+|      2 | Jai        | Murugan   | jai@gmail.com | 9123456780 | villupuram, Tamil Nadu |    165000 |
++--------+------------+-----------+---------------+------------+------------------------+-----------+
+1 row in set (0.00 sec)
+
+
+8. Write an SQL query to list electronic gadgets and the number of times each product has been
+ordered.
+
+
+mysql> select p.p_name , count(od.p_id) from products p
+    -> inner join orderdetails od
+    -> on od.p_id = p.p_id
+    -> group by od.p_id,p.p_id;
++------------+----------------+
+| p_name     | count(od.p_id) |
++------------+----------------+
+| Laptop     |              1 |
+| Smartphone |              1 |
+| Tablet     |              2 |
+| Headphones |              1 |
+| Smartwatch |              1 |
+| Monitor    |              1 |
+| Keyboard   |              1 |
+| Speaker    |              1 |
++------------+----------------+
+8 rows in set (0.00 sec)
+
+
+9. Write an SQL query to find customers who have purchased a specific electronic gadget product.
+Allow users to input the product name as a parameter.
+
+mysql> select c.first_name , c.last_name from customers c
+    -> inner join orders o on o.cust_id = c.cust_id
+    -> inner join orderdetails od on od.ord_id = o.ord_id
+    -> inner join products p on od.p_id = p.p_id
+    -> where p_name = "Laptop";
+
++------------+-----------+
+| first_name | last_name |
++------------+-----------+
+| Karthik    | Rajan     |
++------------+-----------+
+1 row in set (0.05 sec)
+
+
+
+10. Write an SQL query to calculate the total revenue generated by all orders placed within a
+specific time period. Allow users to input the start and end dates as parameters.
+
+
+mysql> select sum(total_amt) from orders
+    -> where ord_date between ' 2024-03-03' and '2024-03-10';
+
++----------------+
+| sum(total_amt) |
++----------------+
+|         244200 |
++----------------+
+1 row in set, 9 warnings (0.09 sec)
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+Task 4:
+=======
+
+1. Write an SQL query to find out which customers have not placed any orders.
+
+select * from customers
+    -> where cust_id not IN (select cust_id from orders);
+
++---------+------------+------------+-------------------------+------------+----------------------------+
+| cust_id | first_name | last_name  | email                   | phone      | address                    |
++---------+------------+------------+-------------------------+------------+----------------------------+
+|     105 | Ramesh     | Venkatesan | ramesh.venkat@gmail.com | 9234567890 | Tiruvannamalai, Tamil Nadu |
+|     110 | yamini     | bala       | yamini.bala@gmail.com   | NULL       | chennai, Tamil Nadu        |
++---------+------------+------------+-------------------------+------------+----------------------------+
+2 rows in set (0.88 sec)
+
+
+2. Write an SQL query to find the total number of products available for sale.
+
+
+mysql> select count(*) AS total_product_for_sale from products;
+
++------------------------+
+| total_product_for_sale |
++------------------------+
+|                     11 |
++------------------------+
+1 row in set (0.03 sec)
+
+3. Write an SQL query to calculate the total revenue generated by TechShop.
+
+
+mysql> select sum(total_amt) as total_revenue from orders;
+
++---------------+
+| total_revenue |
++---------------+
+|        550000 |
++---------------+
+1 row in set (0.00 sec)
+
+
+4. Write an SQL query to calculate the average quantity ordered for products in a specific category.
+Allow users to input the category name as a parameter.
+
+
+mysql> select avg(qty) from orderdetails
+    -> where p_id = (select p_id from products where p_name ="Laptop" );
+    
++----------+
+| avg(qty) |
++----------+
+|   1.0000 |
++----------+
+1 row in set (0.06 sec)
+
+5. Write an SQL query to calculate the total revenue generated by a specific customer. Allow users
+to input the customer ID as a parameter.
+
+
+mysql> select sum(total_amt) from orders
+    -> where cust_id = (select cust_id from customers where First_name = "Abishek");
+
++----------------+
+| sum(total_amt) |
++----------------+
+|         140800 |
++----------------+
+1 row in set (0.00 sec)
+
+6. Write an SQL query to find the customers who have placed the most orders. List their names
+and the number of orders they've placed.
+
+mysql> select c.First_name , c.last_name , count(o.ord_id) from customers c
+    -> join orders o on o.cust_id = c.cust_id
+    -> group by o.cust_id , c.first_name , c.last_name
+    -> order by count(o.cust_id) desc limit 1;
+
++------------+-----------+-----------------+
+| First_name | last_name | count(o.ord_id) |
++------------+-----------+-----------------+
+| Abishek    | Joel      |               2 |
++------------+-----------+-----------------+
+1 row in set (0.00 sec)
+
+7. Write an SQL query to find the most popular product category, which is the one with the highest
+total quantity ordered across all orders.
+
+
+mysql> select p.p_name , sum(od.qty) from products p
+    -> join orderdetails od on p.p_id = od.p_id
+    -> group by od.p_id
+    -> order by sum(od.qty) desc limit 1;
+
++----------+-------------+
+| p_name   | sum(od.qty) |
++----------+-------------+
+| Keyboard |           5 |
++----------+-------------+
+1 row in set (0.05 sec)
+
+8. Write an SQL query to find the customer who has spent the most money (highest total revenue)
+on electronic gadgets. List their name and total spending
+
+mysql> select c.first_name , c.last_name , o.total_amt from customers c
+    -> join orders o
+    -> on c.cust_id = o.cust_id
+    -> order by total_amt desc limit 1;
+
++------------+-----------+-----------+
+| first_name | last_name | total_amt |
++------------+-----------+-----------+
+| Jai        | Murugan   |    165000 |
++------------+-----------+-----------+
+1 row in set (0.00 sec)
+
+
+9. Write an SQL query to calculate the average order value (total revenue divided by the number of
+orders) for all customers.
+
+
+mysql> select cust_id, avg(total_amt) average_amount from orders
+    -> group by cust_id;
+
++---------+----------------+
+| cust_id | average_amount |
++---------+----------------+
+|     100 |    140800.0000 |
+|     101 |    165000.0000 |
+|     102 |     60500.0000 |
+|     103 |     44000.0000 |
+|     104 |     27500.0000 |
+|     106 |     77000.0000 |
+|     107 |     35200.0000 |
+|     108 |           NULL |
+|     109 |           NULL |
++---------+----------------+
+9 rows in set (0.00 sec)
+
+10. Write an SQL query to find the total number of orders placed by each customer and list their
+names along with the order count.
+
+    
+mysql> select c.First_name , c.last_name , count(o.ord_id) from customers c
+    ->  join orders o on o.cust_id = c.cust_id
+    ->  group by o.cust_id , c.first_name , c.last_name;
+
++------------+-----------+-----------------+
+| First_name | last_name | count(o.ord_id) |
++------------+-----------+-----------------+
+| Abishek    | Joel      |               1 |
+| Jai        | Murugan   |               1 |
+| Karthik    | Rajan     |               1 |
+| Mohan      | Babu      |               1 |
+| Priya      | Sundar    |               1 |
+| Sandhya    | Murali    |               1 |
+| Ganesh     | Subramani |               1 |
+| Meena      | Ravi      |               1 |
+| Vikram     | S         |               1 |
++------------+-----------+-----------------+
+9 rows in set (0.00 sec)
