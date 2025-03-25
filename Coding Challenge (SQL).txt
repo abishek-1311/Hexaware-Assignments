@@ -1,0 +1,605 @@
+					Coding Challenge - Car Rental System – SQL
+					==========================================
+
+SQL Schema:
+============
+1. Vehicle Table:
+-----------------
+• vehicleID (Primary Key)
+• make
+• model
+• year
+• dailyRate
+• status (available, notAvailable)
+• passengerCapacity
+• engineCapacity
+
+2. Customer Table:
+------------------
+• customerID (Primary Key)
+• firstName
+• lastName
+• email
+• phoneNumber
+
+3. Lease Table:
+---------------
+• leaseID (Primary Key)
+• vehicleID (Foreign Key referencing Vehicle Table)
+• customerID (Foreign Key referencing Customer Table)
+• startDate
+• endDate
+• type (to distinguish between DailyLease and MonthlyLease)
+
+4. Payment Table:
+------------------
+• paymentID (Primary Key)
+• leaseID (Foreign Key referencing Lease Table)
+• paymentDate
+• amount
+
+
+--------------------------------------TABLE CREATION---------------------------------------
+
+mysql> create table vehicle ( car_id int primary key,
+    -> make varchar(20) not null,
+    -> model varchar(20) not null,
+    -> year int,
+    -> daily_rate decimal(4,2),
+    -> status int ,
+    -> pass_cap int,
+    -> engine_cap int);
+Query OK, 0 rows affected (1.14 sec)
+
+
+mysql> desc vehicle;
++------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| car_id     | int          | NO   | PRI | NULL    |       |
+| make       | varchar(20)  | NO   |     | NULL    |       |
+| model      | varchar(20)  | NO   |     | NULL    |       |
+| year       | int          | YES  |     | NULL    |       |
+| daily_rate | decimal(4,2) | YES  |     | NULL    |       |
+| status     | int          | NO   |     | NULL    |       |
+| pass_cap   | int          | YES  |     | NULL    |       |
+| engine_cap | int          | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+8 rows in set (0.33 sec)
+
+mysql> create table customers ( cust_id int primary key,
+    -> f_name varchar(20) not null,
+    -> l_name varchar(20) not null,
+    -> email varchar(50) unique,
+    -> phone varchar(10));
+Query OK, 0 rows affected (2.52 sec)
+
+
+mysql> desc customers;
++---------+-------------+------+-----+---------+-------+
+| Field   | Type        | Null | Key | Default | Extra |
++---------+-------------+------+-----+---------+-------+
+| cust_id | int         | NO   | PRI | NULL    |       |
+| f_name  | varchar(20) | NO   |     | NULL    |       |
+| l_name  | varchar(20) | NO   |     | NULL    |       |
+| email   | varchar(50) | YES  | UNI | NULL    |       |
+| phone   | varchar(10) | YES  |     | NULL    |       |
++---------+-------------+------+-----+---------+-------+
+5 rows in set (0.03 sec)
+
+
+
+mysql> create table lease( lease_id int primary key,
+    -> car_id int ,
+    -> cust_id int ,
+    -> start_date date,
+    -> end_date date,
+    -> type varchar(10),
+    -> foreign key(car_id) references vehicle(car_id) on delete cascade,
+    -> foreign key(cust_id) references customers(cust_id) on delete cascade);
+Query OK, 0 rows affected (2.52 sec)
+
+
+mysql> desc lease;
++------------+-------------+------+-----+---------+-------+
+| Field      | Type        | Null | Key | Default | Extra |
++------------+-------------+------+-----+---------+-------+
+| lease_id   | int         | NO   | PRI | NULL    |       |
+| car_id     | int         | YES  | MUL | NULL    |       |
+| cust_id    | int         | YES  | MUL | NULL    |       |
+| start_date | date        | YES  |     | NULL    |       |
+| end_date   | date        | YES  |     | NULL    |       |
+| type       | varchar(10) | YES  |     | NULL    |       |
++------------+-------------+------+-----+---------+-------+
+6 rows in set (0.02 sec)
+
+
+mysql> create table payment ( pay_id int primary key,
+    -> lease_id int ,
+    -> pay_date date,
+    -> amt decimal(9,2),
+    -> foreign key(lease_id) references lease(lease_id) on delete cascade);
+Query OK, 0 rows affected (1.91 sec)
+
+
+mysql> desc payment;
++----------+--------------+------+-----+---------+-------+
+| Field    | Type         | Null | Key | Default | Extra |
++----------+--------------+------+-----+---------+-------+
+| pay_id   | int          | NO   | PRI | NULL    |       |
+| lease_id | int          | YES  | MUL | NULL    |       |
+| pay_date | date         | YES  |     | NULL    |       |
+| amt      | decimal(9,2) | YES  |     | NULL    |       |
++----------+--------------+------+-----+---------+-------+
+4 rows in set (0.05 sec)
+
+
+------------------------------------------------------TABLE INSERTION--------------------------------------------------
+
+mysql> insert into vehicle (car_id, make, model, year, daily_rate, status, pass_cap, engine_cap) values
+    -> (1,'Toyota','Camry',2022,50.00,1,4,1450),
+    -> (2,'Honda','Civic',2023,45.00,1,7,1500),
+    -> (3,'Ford','Focus',2022,48.00,0,4,1400),
+    -> (4,'Nissan','Altima',2023,52.00,1,7,1200),
+    -> (5,'Chevrolet','Malibu',2022, 47.00,1,4,1800),
+    -> (6,'Hyundai','Sonata',2023,49.00,0,7,1400),
+    -> (7,'BMW','3 Series',2023, 60.00, 1,7,2499),
+    -> (8,'Mercedes','C-Class',2022,58.00,1,8,2599),
+    -> (9,'Audi','A4',2022,55.00,0,4,2500),
+    -> (10,'Lexus','ES',2023,54.00,1,4,2500);
+Query OK, 10 rows affected (0.74 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> select * from vehicle;
++--------+-----------+----------+------+------------+--------+----------+------------+
+| car_id | make      | model    | year | daily_rate | status | pass_cap | engine_cap |
++--------+-----------+----------+------+------------+--------+----------+------------+
+|      1 | Toyota    | Camry    | 2022 |      50.00 |      1 |        4 |       1450 |
+|      2 | Honda     | Civic    | 2023 |      45.00 |      1 |        7 |       1500 |
+|      3 | Ford      | Focus    | 2022 |      48.00 |      0 |        4 |       1400 |
+|      4 | Nissan    | Altima   | 2023 |      52.00 |      1 |        7 |       1200 |
+|      5 | Chevrolet | Malibu   | 2022 |      47.00 |      1 |        4 |       1800 |
+|      6 | Hyundai   | Sonata   | 2023 |      49.00 |      0 |        7 |       1400 |
+|      7 | BMW       | 3 Series | 2023 |      60.00 |      1 |        7 |       2499 |
+|      8 | Mercedes  | C-Class  | 2022 |      58.00 |      1 |        8 |       2599 |
+|      9 | Audi      | A4       | 2022 |      55.00 |      0 |        4 |       2500 |
+|     10 | Lexus     | ES       | 2023 |      54.00 |      1 |        4 |       2500 |
++--------+-----------+----------+------+------------+--------+----------+------------+
+10 rows in set (0.07 sec)
+
+mysql> insert into payment (pay_id,lease_id,pay_date,amt) values
+    -> (1, 1,'2023-01-03',200.00),
+    -> (2, 2,'2023-02-20',1000.00),
+    -> (3, 3,'2023-03-12',75.00),
+    -> (4, 4,'2023-04-25',900.00),
+    -> (5, 5,'2023-05-07',60.00),
+    -> (6, 6,'2023-06-18',1200.00),
+    -> (7, 7,'2023-07-03',40.00),
+    -> (8, 8,'2023-08-14',1100.00),
+    -> (9, 9,'2023-09-09',80.00),
+    -> (10, 10, '2023-10-25', 1500.00);
+Query OK, 10 rows affected (0.30 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> select * from payment;
++--------+----------+------------+---------+
+| pay_id | lease_id | pay_date   | amt     |
++--------+----------+------------+---------+
+|      1 |        1 | 2023-01-03 |  200.00 |
+|      2 |        2 | 2023-02-20 | 1000.00 |
+|      3 |        3 | 2023-03-12 |   75.00 |
+|      4 |        4 | 2023-04-25 |  900.00 |
+|      5 |        5 | 2023-05-07 |   60.00 |
+|      6 |        6 | 2023-06-18 | 1200.00 |
+|      7 |        7 | 2023-07-03 |   40.00 |
+|      8 |        8 | 2023-08-14 | 1100.00 |
+|      9 |        9 | 2023-09-09 |   80.00 |
+|     10 |       10 | 2023-10-25 | 1500.00 |
++--------+----------+------------+---------+
+10 rows in set (0.08 sec)
+
+
+mysql> insert into Customers (cust_id,f_name,l_name,email,phone) values
+    -> (1,'John','Doe','johndoe@example.com','555-555-5555'),
+    -> (2,'Jane','Smith', 'janesmith@example.com','555-123-4567'),
+    -> (3,'Robert','Johnson', 'robert@example.com','555-789-1234'),
+    -> (4,'Sarah','Brown', 'sarah@example.com', '555-456-7890'),
+    -> (5,'David','Lee', 'david@example.com','555-987-6543'),
+    -> (6,'Laura','Hall','laura@example.com','555-234-5678'),
+    -> (7,'Michael','Davis','michael@example.com','555-876-5432'),
+    -> (8,'Emma','Wilson','emma@example.com','555-432-1098'),
+    -> (9,'William','Taylor', 'william@example.com', '555-321-6547'),
+    -> (10,'Olivia','Adams', 'olivia@example.com','555-765-4321');
+Query OK, 10 rows affected (0.79 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+
+mysql> select * from customers;
++---------+---------+---------+-----------------------+--------------+
+| cust_id | f_name  | l_name  | email                 | phone        |
++---------+---------+---------+-----------------------+--------------+
+|       1 | John    | Doe     | johndoe@example.com   | 555-555-5555 |
+|       2 | Jane    | Smith   | janesmith@example.com | 555-123-4567 |
+|       3 | Robert  | Johnson | robert@example.com    | 555-789-1234 |
+|       4 | Sarah   | Brown   | sarah@example.com     | 555-456-7890 |
+|       5 | David   | Lee     | david@example.com     | 555-987-6543 |
+|       6 | Laura   | Hall    | laura@example.com     | 555-234-5678 |
+|       7 | Michael | Davis   | michael@example.com   | 555-876-5432 |
+|       8 | Emma    | Wilson  | emma@example.com      | 555-432-1098 |
+|       9 | William | Taylor  | william@example.com   | 555-321-6547 |
+|      10 | Olivia  | Adams   | olivia@example.com    | 555-765-4321 |
++---------+---------+---------+-----------------------+--------------+
+10 rows in set (0.00 sec)
+
+
+mysql> insert Lease (lease_id,car_id,cust_id,start_date,end_date,type) values
+    -> (1, 1, 1, '2023-01-01', '2023-01-05', 'Daily'),
+    -> (2, 2, 2, '2023-02-15', '2023-02-28', 'Monthly'),
+    -> (3, 3, 3, '2023-03-10', '2023-03-15', 'Daily'),
+    -> (4, 4, 4, '2023-04-20', '2023-04-30', 'Monthly'),
+    -> (5, 5, 5, '2023-05-05', '2023-05-10', 'Daily'),
+    -> (6, 4, 3, '2023-06-15', '2023-06-30', 'Monthly'),
+    -> (7, 7, 7, '2023-07-01', '2023-07-10', 'Daily'),
+    -> (8, 8, 8, '2023-08-12', '2023-08-15', 'Monthly'),
+    -> (9, 3, 3, '2023-09-07', '2023-09-10', 'Daily'),
+    -> (10, 10, 10, '2023-10-10', '2023-10-31', 'Monthly');
+Query OK, 10 rows affected (0.51 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+
+mysql> select * from lease;
++----------+--------+---------+------------+------------+---------+
+| lease_id | car_id | cust_id | start_date | end_date   | type    |
++----------+--------+---------+------------+------------+---------+
+|        1 |      1 |       1 | 2023-01-01 | 2023-01-05 | Daily   |
+|        2 |      2 |       2 | 2023-02-15 | 2023-02-28 | Monthly |
+|        3 |      3 |       3 | 2023-03-10 | 2023-03-15 | Daily   |
+|        4 |      4 |       4 | 2023-04-20 | 2023-04-30 | Monthly |
+|        5 |      5 |       5 | 2023-05-05 | 2023-05-10 | Daily   |
+|        6 |      4 |       3 | 2023-06-15 | 2023-06-30 | Monthly |
+|        7 |      7 |       7 | 2023-07-01 | 2023-07-10 | Daily   |
+|        8 |      8 |       8 | 2023-08-12 | 2023-08-15 | Monthly |
+|        9 |      3 |       3 | 2023-09-07 | 2023-09-10 | Daily   |
+|       10 |     10 |      10 | 2023-10-10 | 2023-10-31 | Monthly |
++----------+--------+---------+------------+------------+---------+
+10 rows in set (0.00 sec)
+
+
+-------------------------------------------------------QUERIES------------------------------------------------------------------------
+
+1. Update the daily rate for a Mercedes car to 68.
+
+
+mysql> update vehicle
+    -> set daily_rate = 68
+    -> where make = 'Mercedes';
+Query OK, 1 row affected (0.23 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from vehicle;
++--------+-----------+----------+------+------------+--------+----------+------------+
+| car_id | make      | model    | year | daily_rate | status | pass_cap | engine_cap |
++--------+-----------+----------+------+------------+--------+----------+------------+
+|      1 | Toyota    | Camry    | 2022 |      50.00 |      1 |        4 |       1450 |
+|      2 | Honda     | Civic    | 2023 |      45.00 |      1 |        7 |       1500 |
+|      3 | Ford      | Focus    | 2022 |      48.00 |      0 |        4 |       1400 |
+|      4 | Nissan    | Altima   | 2023 |      52.00 |      1 |        7 |       1200 |
+|      5 | Chevrolet | Malibu   | 2022 |      47.00 |      1 |        4 |       1800 |
+|      6 | Hyundai   | Sonata   | 2023 |      49.00 |      0 |        7 |       1400 |
+|      7 | BMW       | 3 Series | 2023 |      60.00 |      1 |        7 |       2499 |
+|      8 | Mercedes  | C-Class  | 2022 |      68.00 |      1 |        8 |       2599 |
+|      9 | Audi      | A4       | 2022 |      55.00 |      0 |        4 |       2500 |
+|     10 | Lexus     | ES       | 2023 |      54.00 |      1 |        4 |       2500 |
++--------+-----------+----------+------+------------+--------+----------+------------+
+10 rows in set (0.00 sec)
+
+2. Delete a specific customer and all associated leases and payments.
+
+mysql> delete from customers
+    -> where cust_id=4;
+Query OK, 1 row affected (0.25 sec)
+
+mysql> select * from lease;
++----------+--------+---------+------------+------------+---------+
+| lease_id | car_id | cust_id | start_date | end_date   | type    |
++----------+--------+---------+------------+------------+---------+
+|        1 |      1 |       1 | 2023-01-01 | 2023-01-05 | Daily   |
+|        2 |      2 |       2 | 2023-02-15 | 2023-02-28 | Monthly |
+|        3 |      3 |       3 | 2023-03-10 | 2023-03-15 | Daily   |  
+|        5 |      5 |       5 | 2023-05-05 | 2023-05-10 | Daily   |     
+|        6 |      4 |       3 | 2023-06-15 | 2023-06-30 | Monthly |
+|        7 |      7 |       7 | 2023-07-01 | 2023-07-10 | Daily   |     
+|        8 |      8 |       8 | 2023-08-12 | 2023-08-15 | Monthly |
+|        9 |      3 |       3 | 2023-09-07 | 2023-09-10 | Daily   |
+|       10 |     10 |      10 | 2023-10-10 | 2023-10-31 | Monthly |
++----------+--------+---------+------------+------------+---------+
+9 rows in set (0.00 sec)
+
+mysql> select * from payment;
++--------+----------+------------+---------+
+| pay_id | lease_id | pay_date   | amt     |
++--------+----------+------------+---------+
+|      1 |        1 | 2023-01-03 |  200.00 |
+|      2 |        2 | 2023-02-20 | 1000.00 |
+|      3 |        3 | 2023-03-12 |   75.00 |
+|      5 |        5 | 2023-05-07 |   60.00 |
+|      6 |        6 | 2023-06-18 | 1200.00 |
+|      7 |        7 | 2023-07-03 |   40.00 |
+|      8 |        8 | 2023-08-14 | 1100.00 |
+|      9 |        9 | 2023-09-09 |   80.00 |
+|     10 |       10 | 2023-10-25 | 1500.00 |
++--------+----------+------------+---------+
+9 rows in set (0.00 sec)
+
+
+
+3. Rename the "paymentDate" column in the Payment table to "transactionDate".
+
+
+mysql> alter table payment
+    -> rename column Pay_date to transactionDate;
+Query OK, 0 rows affected (0.78 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from payment;
++--------+----------+-----------------+---------+
+| pay_id | lease_id | transactionDate | amt     |
++--------+----------+-----------------+---------+
+|      1 |        1 | 2023-01-03      |  200.00 |
+|      2 |        2 | 2023-02-20      | 1000.00 |
+|      3 |        3 | 2023-03-12      |   75.00 |
+|      5 |        5 | 2023-05-07      |   60.00 |
+|      6 |        6 | 2023-06-18      | 1200.00 |
+|      7 |        7 | 2023-07-03      |   40.00 |
+|      8 |        8 | 2023-08-14      | 1100.00 |
+|      9 |        9 | 2023-09-09      |   80.00 |
+|     10 |       10 | 2023-10-25      | 1500.00 |
++--------+----------+-----------------+---------+
+9 rows in set (0.00 sec)
+
+
+4. Find a specific customer by email.
+
+mysql> select * from customers
+    -> where email='david@example.com';
++---------+--------+--------+-------------------+--------------+
+| cust_id | f_name | l_name | email             | phone        |
++---------+--------+--------+-------------------+--------------+
+|       5 | David  | Lee    | david@example.com | 555-987-6543 |
++---------+--------+--------+-------------------+--------------+
+1 row in set (0.05 sec)
+
+5. Get active leases for a specific customer
+
+mysql> select * from lease
+    -> where cust_id = 3;
++----------+--------+---------+------------+------------+---------+
+| lease_id | car_id | cust_id | start_date | end_date   | type    |
++----------+--------+---------+------------+------------+---------+
+|        3 |      3 |       3 | 2023-03-10 | 2023-03-15 | Daily   |
+|        6 |      4 |       3 | 2023-06-15 | 2023-06-30 | Monthly |
+|        9 |      3 |       3 | 2023-09-07 | 2023-09-10 | Daily   |
++----------+--------+---------+------------+------------+---------+
+3 rows in set (0.08 sec)
+
+6. Find all payments made by a customer with a specific phone number.
+
+mysql> select p.pay_id,p.lease_id,p.trans_date,p.amt  from payment p
+    -> join lease l on p.lease_id = l.lease_id
+    -> join customers c on c.cust_id= l.cust_id
+    -> where phone ='555-765-4321';
++--------+----------+------------+---------+
+| pay_id | lease_id | trans_date | amt     |
++--------+----------+------------+---------+
+|     10 |       10 | 2023-10-25 | 1500.00 |
++--------+----------+------------+---------+
+1 row in set (0.00 sec)
+
+
+7. Calculate the average daily rate of all available cars.
+
+
+mysql> select avg(daily_rate) as Average_dailyRate_AvailCars from vehicle
+    -> where status = 1;
++-----------------------------+
+| Average_dailyRate_AvailCars |
++-----------------------------+
+|                   53.714286 |
++-----------------------------+
+1 row in set (0.04 sec)
+
+8. Find the car with the highest daily rate.
+
+mysql> select max(daily_rate) as Highest_daily_Rate from vehicle;
++--------------------+
+| Highest_daily_Rate |
++--------------------+
+|              68.00 |
++--------------------+
+1 row in set (0.00 sec)
+
+9. Retrieve all cars leased by a specific customer.
+
+
+mysql> select v.car_id , v.make , v.model , v.year , v.daily_rate , v.pass_cap , v.engine_cap from vehicle v
+    -> join lease l on v.car_id = l.car_id
+    -> join customers c on c.cust_id = l.cust_id
+    -> where f_name = 'Robert';
++--------+--------+--------+------+------------+----------+------------+
+| car_id | make   | model  | year | daily_rate | pass_cap | engine_cap |
++--------+--------+--------+------+------------+----------+------------+
+|      3 | Ford   | Focus  | 2022 |      48.00 |        4 |       1400 |
+|      4 | Nissan | Altima | 2023 |      52.00 |        7 |       1200 |
+|      3 | Ford   | Focus  | 2022 |      48.00 |        4 |       1400 |
++--------+--------+--------+------+------------+----------+------------+
+3 rows in set (0.00 sec)
+
+10. Find the details of the most recent lease.
+
+
+mysql> select * from lease
+    -> order by start_date desc limit 1;
++----------+--------+---------+------------+------------+---------+
+| lease_id | car_id | cust_id | start_date | end_date   | type    |
++----------+--------+---------+------------+------------+---------+
+|       10 |     10 |      10 | 2023-10-10 | 2023-10-31 | Monthly |
++----------+--------+---------+------------+------------+---------+
+1 row in set (0.03 sec)
+
+11. List all payments made in the year 2023.
+
+
+mysql> select * from payment
+    -> where extract(YEAR from trans_date) = 2023;
++--------+----------+------------+---------+
+| pay_id | lease_id | trans_date | amt     |
++--------+----------+------------+---------+
+|      1 |        1 | 2023-01-03 |  200.00 |
+|      2 |        2 | 2023-02-20 | 1000.00 |
+|      3 |        3 | 2023-03-12 |   75.00 |
+|      5 |        5 | 2023-05-07 |   60.00 |
+|      6 |        6 | 2023-06-18 | 1200.00 |
+|      7 |        7 | 2023-07-03 |   40.00 |
+|      8 |        8 | 2023-08-14 | 1100.00 |
+|      9 |        9 | 2023-09-09 |   80.00 |
+|     10 |       10 | 2023-10-25 | 1500.00 |
++--------+----------+------------+---------+
+9 rows in set (0.00 sec)
+
+12. Retrieve customers who have not made any payments.
+
+mysql> select cust_id , f_name as First_name , l_name as Last_name , email , phone from customers
+    -> where cust_id not in (select l.cust_id from lease l join payment p on l.lease_id = p.lease_id);
++---------+------------+-----------+---------------------+--------------+
+| cust_id | First_name | Last_name | email               | phone        |
++---------+------------+-----------+---------------------+--------------+
+|       6 | Laura      | Hall      | laura@example.com   | 555-234-5678 |
+|       9 | William    | Taylor    | william@example.com | 555-321-6547 |
++---------+------------+-----------+---------------------+--------------+
+2 rows in set (0.12 sec)
+
+
+
+13. Retrieve Car Details and Their Total Payments.
+
+
+mysql> select v.car_id , v.make , v.model, sum(p.amt) as Total_Payment from vehicle v
+    -> join lease l on v.car_id = l.car_id
+    -> join payment p on l.lease_id = p.lease_id
+    -> group by l.car_id;
++--------+-----------+----------+---------------+
+| car_id | make      | model    | Total_Payment |
++--------+-----------+----------+---------------+
+|      1 | Toyota    | Camry    |        200.00 |
+|      2 | Honda     | Civic    |       1000.00 |
+|      3 | Ford      | Focus    |        155.00 |
+|      4 | Nissan    | Altima   |       1200.00 |
+|      5 | Chevrolet | Malibu   |         60.00 |
+|      7 | BMW       | 3 Series |         40.00 |
+|      8 | Mercedes  | C-Class  |       1100.00 |
+|     10 | Lexus     | ES       |       1500.00 |
++--------+-----------+----------+---------------+
+8 rows in set (0.00 sec)
+
+14. Calculate Total Payments for Each Customer.
+
+mysql> select c.cust_id , c.f_name , c.l_name , c.email , c.phone , sum(p.amt) as Total_Payment from customers c
+    -> join lease l on l.cust_id = c.cust_id
+    -> join payment p on p.lease_id = l.lease_id
+    -> group by l.cust_id;
++---------+---------+---------+-----------------------+--------------+---------------+
+| cust_id | f_name  | l_name  | email                 | phone        | Total_Payment |
++---------+---------+---------+-----------------------+--------------+---------------+
+|       1 | John    | Doe     | johndoe@example.com   | 555-555-5555 |        200.00 |
+|       2 | Jane    | Smith   | janesmith@example.com | 555-123-4567 |       1000.00 |
+|       3 | Robert  | Johnson | robert@example.com    | 555-789-1234 |       1355.00 |
+|       5 | David   | Lee     | david@example.com     | 555-987-6543 |         60.00 |
+|       7 | Michael | Davis   | michael@example.com   | 555-876-5432 |         40.00 |
+|       8 | Emma    | Wilson  | emma@example.com      | 555-432-1098 |       1100.00 |
+|      10 | Olivia  | Adams   | olivia@example.com    | 555-765-4321 |       1500.00 |
++---------+---------+---------+-----------------------+--------------+---------------+
+7 rows in set (0.00 sec)
+
+
+15. List Car Details for Each Lease.
+
+
+mysql> select l.lease_id , l.car_id , v.make , v.model , v.year , v.daily_rate , v.status , v.pass_cap , v.engine_cap from vehicle v
+    -> join lease l on v.car_id = l.car_id;
++----------+--------+-----------+----------+------+------------+--------+----------+------------+
+| lease_id | car_id | make      | model    | year | daily_rate | status | pass_cap | engine_cap |
++----------+--------+-----------+----------+------+------------+--------+----------+------------+
+|        1 |      1 | Toyota    | Camry    | 2022 |      50.00 |      1 |        4 |       1450 |
+|        2 |      2 | Honda     | Civic    | 2023 |      45.00 |      1 |        7 |       1500 |
+|        3 |      3 | Ford      | Focus    | 2022 |      48.00 |      0 |        4 |       1400 |
+|        9 |      3 | Ford      | Focus    | 2022 |      48.00 |      0 |        4 |       1400 |
+|        6 |      4 | Nissan    | Altima   | 2023 |      52.00 |      1 |        7 |       1200 |
+|        5 |      5 | Chevrolet | Malibu   | 2022 |      47.00 |      1 |        4 |       1800 |
+|        7 |      7 | BMW       | 3 Series | 2023 |      60.00 |      1 |        7 |       2499 |
+|        8 |      8 | Mercedes  | C-Class  | 2022 |      68.00 |      1 |        8 |       2599 |
+|       10 |     10 | Lexus     | ES       | 2023 |      54.00 |      1 |        4 |       2500 |
++----------+--------+-----------+----------+------+------------+--------+----------+------------+
+9 rows in set (0.00 sec)
+
+
+16. Retrieve Details of Active Leases with Customer and Car Information.
+
+
+mysql> select l.lease_id, c.cust_id , c.f_name ,c.l_name , c.email , c.phone , v.car_id, v.make , v.model  from customers c
+    -> join lease l on c.cust_id = l.cust_id
+    -> join vehicle v on v.car_id = l.car_id ;
++----------+---------+---------+---------+-----------------------+--------------+--------+-----------+----------+
+| lease_id | cust_id | f_name  | l_name  | email                 | phone        | car_id | make      | model    |
++----------+---------+---------+---------+-----------------------+--------------+--------+-----------+----------+
+|        1 |       1 | John    | Doe     | johndoe@example.com   | 555-555-5555 |      1 | Toyota    | Camry    |
+|        2 |       2 | Jane    | Smith   | janesmith@example.com | 555-123-4567 |      2 | Honda     | Civic    |
+|        3 |       3 | Robert  | Johnson | robert@example.com    | 555-789-1234 |      3 | Ford      | Focus    |
+|        5 |       5 | David   | Lee     | david@example.com     | 555-987-6543 |      5 | Chevrolet | Malibu   |
+|        6 |       3 | Robert  | Johnson | robert@example.com    | 555-789-1234 |      4 | Nissan    | Altima   |
+|        7 |       7 | Michael | Davis   | michael@example.com   | 555-876-5432 |      7 | BMW       | 3 Series |
+|        8 |       8 | Emma    | Wilson  | emma@example.com      | 555-432-1098 |      8 | Mercedes  | C-Class  |
+|        9 |       3 | Robert  | Johnson | robert@example.com    | 555-789-1234 |      3 | Ford      | Focus    |
+|       10 |      10 | Olivia  | Adams   | olivia@example.com    | 555-765-4321 |     10 | Lexus     | ES       |
++----------+---------+---------+---------+-----------------------+--------------+--------+-----------+----------+
+9 rows in set (0.00 sec)
+
+
+17. Find the Customer Who Has Spent the Most on Leases.
+
+mysql> select c.cust_id , c.f_name , c.l_name , c.email , c.phone , sum(p.amt) as Total_Payment from customers c
+    -> join lease l on l.cust_id = c.cust_id
+    -> join payment p on p.lease_id = l.lease_id
+    -> group by l.cust_id
+    -> order by sum(p.amt) desc  limit 1;
++---------+--------+--------+--------------------+--------------+---------------+
+| cust_id | f_name | l_name | email              | phone        | Total_Payment |
++---------+--------+--------+--------------------+--------------+---------------+
+|      10 | Olivia | Adams  | olivia@example.com | 555-765-4321 |       1500.00 |
++---------+--------+--------+--------------------+--------------+---------------+
+1 row in set (0.07 sec)
+
+18. List All Cars with Their Current Lease Information.
+
+
+mysql> select * from vehicle v
+    -> join lease l on v.car_id = l.car_id ;
++--------+-----------+----------+------+------------+--------+----------+------------+----------+--------+---------+------------+------------+---------+
+| car_id | make      | model    | year | daily_rate | status | pass_cap | engine_cap | lease_id | car_id | cust_id | start_date | end_date   | type    |
++--------+-----------+----------+------+------------+--------+----------+------------+----------+--------+---------+------------+------------+---------+
+|      1 | Toyota    | Camry    | 2022 |      50.00 |      1 |        4 |       1450 |        1 |      1 |       1 | 2023-01-01 | 2023-01-05 | Daily   |
+|      2 | Honda     | Civic    | 2023 |      45.00 |      1 |        7 |       1500 |        2 |      2 |       2 | 2023-02-15 | 2023-02-28 | Monthly |
+|      3 | Ford      | Focus    | 2022 |      48.00 |      0 |        4 |       1400 |        3 |      3 |       3 | 2023-03-10 | 2023-03-15 | Daily   |
+|      5 | Chevrolet | Malibu   | 2022 |      47.00 |      1 |        4 |       1800 |        5 |      5 |       5 | 2023-05-05 | 2023-05-10 | Daily   |
+|      4 | Nissan    | Altima   | 2023 |      52.00 |      1 |        7 |       1200 |        6 |      4 |       3 | 2023-06-15 | 2023-06-30 | Monthly |
+|      7 | BMW       | 3 Series | 2023 |      60.00 |      1 |        7 |       2499 |        7 |      7 |       7 | 2023-07-01 | 2023-07-10 | Daily   |
+|      8 | Mercedes  | C-Class  | 2022 |      68.00 |      1 |        8 |       2599 |        8 |      8 |       8 | 2023-08-12 | 2023-08-15 | Monthly |
+|      3 | Ford      | Focus    | 2022 |      48.00 |      0 |        4 |       1400 |        9 |      3 |       3 | 2023-09-07 | 2023-09-10 | Daily   |
+|     10 | Lexus     | ES       | 2023 |      54.00 |      1 |        4 |       2500 |       10 |     10 |      10 | 2023-10-10 | 2023-10-31 | Monthly |
++--------+-----------+----------+------+------------+--------+----------+------------+----------+--------+---------+------------+------------+---------+
+9 rows in set (0.00 sec)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
