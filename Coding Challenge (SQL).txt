@@ -372,7 +372,7 @@ mysql> select * from customers
 5. Get active leases for a specific customer
 
 mysql> select * from lease
-    -> where cust_id = 3;
+    -> where cust_id = 3 and end_date< curdate();
 +----------+--------+---------+------------+------------+---------+
 | lease_id | car_id | cust_id | start_date | end_date   | type    |
 +----------+--------+---------+------------+------------+---------+
